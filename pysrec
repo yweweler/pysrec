@@ -5,7 +5,7 @@ The command line interface for pysrec.
 
 import click
 
-# import zwuenf.pysrec
+from zwuenf.pysrec.SRecord import SRecord
 
 
 @click.group()
@@ -19,12 +19,18 @@ def cli():
 @cli.command(
     short_help='Print Motorola S-record file.',
     help="""Print the lines of a Motorola S-Record file.""")
-@click.option('--start', default=1, help='Line to start with printing. (allows python style indexing)')
-@click.option('--end', default=None, help='Line to end with printing. (allows python style indexing)')
+@click.option('--start', default=0, help='Line to start with printing. (allows python style indexing)')
+@click.option('--end', default=0, help='Line to end with printing. (allows python style indexing)')
 @click.argument('file')
 def cat(start, end, file):
-    click.echo()
-    click.echo("Not implemented yet!")
+    with open(file) as f:
+        lines = f.readlines()
+
+    if end is 0:
+        end = len(lines)
+
+    for line in lines[start:end]:
+        click.echo(SRecord(line))
 
 
 @cli.command(
