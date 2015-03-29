@@ -20,7 +20,7 @@ class SRecord:
 
         self.type = 0x00
         self.__count = 0x00
-        self.__address = 0x00
+        self.address = 0x00
         self.__data = 0x00
         self.__crc = 0x00
         self.__length = len(str)
@@ -29,8 +29,8 @@ class SRecord:
 
     def __str__(self):
         addr = ''
-        if self.__address is not None:
-            addr = '{1:0{0}X}'.format(self.addr_len(), self.__address)
+        if self.address is not None:
+            addr = '{1:0{0}X}'.format(self.addr_len(), self.address)
 
         data = ''
         if self.__data is not None:
@@ -54,9 +54,9 @@ class SRecord:
             self.__count = int(str[2:4], 16)
 
             addr_str = str[4:4+self.addr_len()]
-            self.__address = None
+            self.address = None
             if len(addr_str) is not 0:
-                self.__address = int(addr_str, 16)
+                self.address = int(addr_str, 16)
 
             data_str = str[4+self.addr_len():-2]
             self.__data = None

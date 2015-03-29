@@ -17,7 +17,7 @@ class SRecordFile:
     def __init__(self, file):
         """SRecordFile constructor"""
         self.__records = list()
-        self.__count = dict()
+        self.__count = None
 
         self.__parse__(file)
         self.__length = os.path.getsize(file)
@@ -46,7 +46,8 @@ class SRecordFile:
             if record.record_group() == SRecordType.UNKNOWN:
                 return MOSType.UNKNOWN
 
-        self.record_counts()
+        if self.__count is None:
+            self.record_counts()
 
         s19 = self.__count[1] + self.__count[9]
         s28 = self.__count[2] + self.__count[8]
@@ -74,3 +75,25 @@ class SRecordFile:
             self.__count[record.type] += 1
 
         return self.__count
+
+    def has_header(self):
+        # TODO: test
+        if self.__count is None:
+            self.record_counts()
+
+        if self.__count[0] > 0:
+            return True
+
+        return False
+
+    def min_address(self):
+        # TODO: test
+        addr = self.__records[0]
+        for record in self.__records:
+            addr = min(addr, record.address)
+
+    def max_address(self):
+        # TODO: test
+        addr = self.__records[0]
+        for record in self.__records:
+            addr = max(addr, record.address)
