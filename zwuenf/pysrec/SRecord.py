@@ -18,7 +18,7 @@ class SRecord:
         self.__min_record_len = 10
         self.__default_addr_len = 6
 
-        self.__type = 0x00
+        self.type = 0x00
         self.__count = 0x00
         self.__address = 0x00
         self.__data = 0x00
@@ -36,7 +36,7 @@ class SRecord:
         if self.__data is not None:
             data = '{1:0{0}X}'.format(self.data_len(), self.__data)
 
-        return ('S{:X}{:02X}{}{}{:02X}').format(self.__type,
+        return ('S{:X}{:02X}{}{}{:02X}').format(self.type,
                                       self.__count,
                                       addr,
                                       data,
@@ -49,7 +49,7 @@ class SRecord:
             raise SRECError
 
         try:
-            self.__type = int(str[1:2], 16)
+            self.type = int(str[1:2], 16)
 
             self.__count = int(str[2:4], 16)
 
@@ -73,13 +73,13 @@ class SRecord:
 
     def record_group(self):
         """Determine SRecord group"""
-        if self.__type == 0:
+        if self.type == 0:
             return SRecordType.HEADER
-        elif 1 <= self.__type <= 3:
+        elif 1 <= self.type <= 3:
             return SRecordType.DATA
-        elif self.__type == 5:
+        elif self.type == 5:
             return SRecordType.COUNT
-        elif 7 <= self.__type <= 9:
+        elif 7 <= self.type <= 9:
             return SRecordType.TERMINATION
         else:
             return SRecordType.UNKNOWN
@@ -93,7 +93,7 @@ class SRecord:
         """Get address length for the SRecord"""
         # TODO
         if self.record_group() is SRecordType.DATA:
-            return (self.__type + 1) * 2
+            return (self.type + 1) * 2
         else:
             return self.__default_addr_len
 

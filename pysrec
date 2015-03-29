@@ -7,7 +7,9 @@ import click
 import os
 
 from zwuenf.pysrec.SRecord import SRecord
-from zwuenf.pysrec import SRECError
+from zwuenf.pysrec.SRecordFile import SRecordFile
+from zwuenf.pysrec import SRECError, SRECNotSRecFileError
+
 
 @click.group()
 def cli():
@@ -23,10 +25,11 @@ def cli():
 @click.option('--start', default=0, help='Line to start with printing. (allows python style indexing)')
 @click.option('--end', default=0, help='Line to end with printing. (allows python style indexing)')
 @click.option('--errors/--no-errors', default=False, help='Don\'t stop displaying the file on parsing errors.')
+# TODO: Add color support to enable better reading!
 @click.argument('file')
 def cat(start, end, errors, file):
     if not os.path.isfile(file):
-        print('File: "{}", is not a file or does not exist.'.format(file))
+        click.echo('File: "{}", is not a file or does not exist.'.format(file))
         exit(1)
 
     with open(file) as f:
@@ -40,11 +43,9 @@ def cat(start, end, errors, file):
             click.echo(SRecord(line))
         except SRECError:
             if errors:
-                print('Line could no be parsed! Try again with --no-errors to ignore errors.')
+                click.echo('Line could no be parsed! Try again with --no-errors to ignore errors.')
                 exit(1)
             pass
-
-
 
 
 @cli.command(
@@ -52,8 +53,33 @@ def cat(start, end, errors, file):
     help="""Show information about a Motorola S-Record file.""")
 @click.argument('file')
 def info(file):
-    click.echo()
-    click.echo("Not implemented yet!")
+    if not os.path.isfile(file):
+        print('File: "{}", is not a file or does not exist.'.format(file))
+        exit(1)
+
+    try:
+        file = SRecordFile(file)
+    except:
+        exit(1)
+    #except SRECNotSRECFileError:
+    #    click.echo('File: "{}", is not a Motorola S-Record file.'.format(file))
+
+    click.echo('='*64)
+    click.echo('MOT Type: {}'.format(file.mot_type()))
+
+    # if file.has_header():
+    #     click.echo('Header Content: {}'.format(file.header_content()))
+    # else:
+    #     click.echo('No Header-Record was found!')
+    #
+    # click.echo('Record statistics: {}'.format(file.record_counts()))
+    #
+    # click.echo('Min. address: {}'.format(file.min_address()))
+    # click.echo('Max. address: {}'.format(file.max_address()))
+    #
+    # click.echo()
+    # click.echo("Not implemented yet!")
+    # click.echo('='*64)
 
 
 @cli.command(
