@@ -1,4 +1,5 @@
 from enum import Enum
+from zwuenf.pysrec import SRECError
 
 
 class SRecordType(Enum):
@@ -45,23 +46,26 @@ class SRecord:
         """Parse SRecord from string"""
         str = str.strip('\r\n')
         if len(str) <= self.__min_record_len:
-            raise SRECParseError
+            raise SRECError
 
-        self.__type = int(str[1:2], 16)
+        try:
+            self.__type = int(str[1:2], 16)
 
-        self.__count = int(str[2:4], 16)
+            self.__count = int(str[2:4], 16)
 
-        addr_str = str[4:4+self.addr_len()]
-        self.__address = None
-        if len(addr_str) is not 0:
-            self.__address = int(addr_str, 16)
+            addr_str = str[4:4+self.addr_len()]
+            self.__address = None
+            if len(addr_str) is not 0:
+                self.__address = int(addr_str, 16)
 
-        data_str = str[4+self.addr_len():-2]
-        self.__data = None
-        if len(data_str) is not 0:
-            self.__data = int(data_str, 16)
+            data_str = str[4+self.addr_len():-2]
+            self.__data = None
+            if len(data_str) is not 0:
+                self.__data = int(data_str, 16)
 
-        self.__crc = int(str[-2:], 16)
+            self.__crc = int(str[-2:], 16)
+        except:
+            raise SRECError
 
     def length(self):
         """Return the Srecord length in bytes"""

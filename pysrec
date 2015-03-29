@@ -4,9 +4,10 @@ The command line interface for pysrec.
 """
 
 import click
+import os
 
 from zwuenf.pysrec.SRecord import SRecord
-
+from zwuenf.pysrec import SRECError
 
 @click.group()
 def cli():
@@ -21,16 +22,29 @@ def cli():
     help="""Print the lines of a Motorola S-Record file.""")
 @click.option('--start', default=0, help='Line to start with printing. (allows python style indexing)')
 @click.option('--end', default=0, help='Line to end with printing. (allows python style indexing)')
+@click.option('--errors/--no-errors', default=False, help='Don\'t stop displaying the file on parsing errors.')
 @click.argument('file')
-def cat(start, end, file):
+def cat(start, end, errors, file):
+    if not os.path.isfile(file):
+        print('File: "{}", is not a file or does not exist.'.format(file))
+        exit(1)
+
     with open(file) as f:
         lines = f.readlines()
 
     if end is 0:
         end = len(lines)
 
-    for line in lines[start:end]:
-        click.echo(SRecord(line))
+    for i, line in enumerate(lines[start:end]):
+        try:
+            click.echo(SRecord(line))
+        except SRECError:
+            if errors:
+                print('Line could no be parsed! Try again with --no-errors to ignore errors.')
+                exit(1)
+            pass
+
+
 
 
 @cli.command(
