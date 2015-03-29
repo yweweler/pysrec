@@ -12,7 +12,7 @@ class MOTType(Enum):
 
 
 class SRecordFile:
-    """Data srtructure fot holding SRecords"""
+    """Data structure for holding SRecords"""
 
     def __init__(self, file):
         """SRecordFile constructor"""
@@ -26,8 +26,10 @@ class SRecordFile:
         """Parse a S-Record file"""
         with open(file) as f:
             for line in f:
-                self.__records.append(SRecord(line))
+                if not line.startswith('S'):
+                    raise SRECNotSRecFileError
 
+                self.__records.append(SRecord(line))
 
     def length(self):
         """Return the S-Record file length in bytes"""

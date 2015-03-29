@@ -57,10 +57,8 @@ def info(file):
         print('File: "{}", is not a file or does not exist.'.format(file))
         exit(1)
 
-    try:
-        file = SRecordFile(file)
-    except:
-        exit(1)
+    # try:
+    file = SRecordFile(file)
     #except SRECNotSRECFileError:
     #    click.echo('File: "{}", is not a Motorola S-Record file.'.format(file))
 
@@ -78,7 +76,6 @@ def info(file):
     # click.echo('Max. address: {}'.format(file.max_address()))
     #
     # click.echo()
-    # click.echo("Not implemented yet!")
     # click.echo('='*64)
 
 
