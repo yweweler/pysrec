@@ -26,9 +26,9 @@ def cli():
 @click.option('--start', default=0, help='Line to start with printing. (allows python style indexing)')
 @click.option('--end', default=0, help='Line to end with printing. (allows python style indexing)')
 @click.option('--errors/--no-errors', default=False, help='Don\'t stop displaying the file on parsing errors.')
-# TODO: Add color support to enable better reading!
+@click.option('--color/--no-color', default=True, help='Display S-Record colored to improve readability')
 @click.argument('file')
-def cat(start, end, errors, file):
+def cat(start, end, errors, color, file):
     if not os.path.isfile(file):
         click.echo('File: "{}", is not a file or does not exist.'.format(file))
         exit(1)
@@ -41,7 +41,7 @@ def cat(start, end, errors, file):
 
     for i, line in enumerate(lines[start:end]):
         try:
-            click.echo(SRecord(line))
+            click.echo(SRecord(line).build_str(color))
         except SRECError:
             if errors:
                 click.echo('Line could no be parsed! Try again with --no-errors to ignore errors.')

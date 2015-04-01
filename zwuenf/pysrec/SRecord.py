@@ -4,7 +4,7 @@ import binascii
 __all__ = ('SRecordType', 'SRecord')
 
 from enum import Enum
-
+from colored import fore, back, style
 from zwuenf.pysrec import SRecordParsingError
 
 
@@ -119,9 +119,11 @@ class SRecord:
         # return low order byte of the complement of the sum of bytes
         return ord(struct.pack('<h', ~sum(self.data))[:1])
 
-    def __str__(self):
-        str_addr = ''
+    def build_str(self, color=False):
+        return self.__str__(color=color)
 
+    def __str__(self, color=False):
+        str_addr = ''
         if self.address is not None:
             str_addr = '{1:0{0}X}'.format(self.address_len(), self.address)
 
@@ -129,4 +131,12 @@ class SRecord:
         if self.data is not None:
             str_data = binascii.hexlify(bytes(bytearray(self.data))).decode('ascii').upper()
 
-        return 'S{:X}{:02X}{}{}{:02X}'.format(self.type, self.count, str_addr, str_data, self.crc)
+        if not color:
+            return 'S{:X}{:02X}{}{}{:02X}'.format(self.type, self.count, str_addr, str_data, self.crc)
+        else:
+            return '{}S{:X}{}{:02X}{}{}{}{}{}{:02X}{}'.format(fore.RED,self.type,
+                                                  fore.YELLOW, self.count,
+                                                  fore.GREEN, str_addr,
+                                                  fore.LIGHT_BLUE, str_data,
+                                                  fore.YELLOW, self.crc,
+                                                  style.RESET)
