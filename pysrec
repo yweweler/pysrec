@@ -9,7 +9,7 @@ import click
 
 from zwuenf.pysrec.SRecord import SRecord
 from zwuenf.pysrec.SRecordFile import SRecordFile
-from zwuenf.pysrec import SRECError
+from zwuenf.pysrec import SRECError, NotSRecFileError
 
 
 @click.group()
@@ -27,6 +27,7 @@ def cli():
 @click.option('--end', default=0, help='Line to end with printing. (allows python style indexing)')
 @click.option('--errors/--no-errors', default=False, help='Don\'t stop displaying the file on parsing errors.')
 @click.option('--color/--no-color', default=True, help='Display S-Record colored to improve readability')
+# TODO. add support for line-numbers
 @click.argument('file')
 def cat(start, end, errors, color, file):
     if not os.path.isfile(file):
@@ -55,29 +56,35 @@ def cat(start, end, errors, color, file):
 @click.argument('file')
 def info(file):
     if not os.path.isfile(file):
-        print('File: "{}", is not a file or does not exist.'.format(file))
+        print('"{}", is not a file or does not exist.'.format(file))
         exit(1)
 
-    # try:
-    file = SRecordFile(file)
-    # except SRECNotSRECFileError:
-    # click.echo('File: "{}", is not a Motorola S-Record file.'.format(file))
-
     click.echo('=' * 64)
-    click.echo('MOT Type: {}'.format(file.mot_type()))
+    click.echo('Analysing file: {}'.format(file))
+    click.echo('=' * 64)
 
-    # if file.has_header():
-    # click.echo('Header Content: {}'.format(file.header_content()))
-    # else:
-    # click.echo('No Header-Record was found!')
-    #
-    # click.echo('Record statistics: {}'.format(file.record_counts()))
-    #
-    # click.echo('Min. address: {}'.format(file.min_address()))
-    # click.echo('Max. address: {}'.format(file.max_address()))
-    #
-    # click.echo()
-    # click.echo('='*64)
+    try:
+        file = SRecordFile(file)
+    except NotSRecFileError:
+        click.echo('File: "{}", is not a Motorola S-Record file.'.format(file))
+
+    click.echo('MOT Type: {}'.format(str(file.mot_type()).split('.')[1]))
+
+    click.echo('Records:')
+    count = file.record_counts()
+    for t in count:
+        click.echo('    S{}: {}'.format(hex(t)[2:].upper(), count[t]))
+
+    if file.has_header():
+        click.echo('Header: {}'.format(file.header_content()))
+    else:
+        click.echo('Header: No Header-Record was found!')
+
+    click.echo('Min. address: {}'.format(hex(file.min_address())))
+    click.echo('Max. address: {}'.format(hex(file.max_address())))
+
+    click.echo('='*64)
+    click.echo()
 
 
 @cli.command(

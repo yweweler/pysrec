@@ -19,8 +19,8 @@ class SRecordType(Enum):
 class SRecord:
     """Data srtructure fot holding SRecords"""
 
-    MIN_RECORD_LEN = 10
-    DEFAULT_ADDR_LEN = 6
+    MIN_RECORD_LEN = 8
+    DEFAULT_ADDR_LEN = 3
 
     # address length in bytes for all record types
     ADDR_LEN = {
@@ -62,8 +62,8 @@ class SRecord:
         self.type = int(str_type[1], 16)
         self.count = int(str_count, 16)
 
-        str_addr = rec[4:4 + self.address_len()]
-        str_data = rec[4 + self.address_len():-2]
+        str_addr = rec[4:4 + self.address_len()*2]
+        str_data = rec[4 + self.address_len()*2:-2]
         str_crc = rec[-2:]
 
         # not all records used to have a address field entry
@@ -108,7 +108,7 @@ class SRecord:
     def length(self):
         """Get the S-Record length in bytes"""
 
-        len_addr = 0 if self.address is None else self.address_len()
+        len_addr = 0 if self.address is None else self.address_len()*2
         len_data = 0 if self.data is None else self.data_len()
         return 3 + len_addr + len_data
 
@@ -125,7 +125,7 @@ class SRecord:
     def __str__(self, color=False):
         str_addr = ''
         if self.address is not None:
-            str_addr = '{1:0{0}X}'.format(self.address_len(), self.address)
+            str_addr = '{1:0{0}X}'.format(self.address_len()*2, self.address)
 
         str_data = ''
         if self.data is not None:
