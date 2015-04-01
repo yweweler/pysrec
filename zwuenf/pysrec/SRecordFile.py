@@ -6,7 +6,7 @@ __all__ = ('MOTType', 'SRecordFile')
 from enum import Enum
 from zwuenf.pysrec.SRecord import SRecordType, SRecord
 from zwuenf.pysrec import *
-from pprint import pprint
+
 
 class MOTType(Enum):
     S19 = 0
@@ -49,7 +49,6 @@ class SRecordFile:
 
         return len(self.__records)
 
-    # TODO: test
     def mot_type(self):
         """Determine files MOT type"""
         for record in self.__records:
@@ -94,6 +93,7 @@ class SRecordFile:
         return self.__count
 
     def has_header(self):
+        """Check if S-Record file has a header record"""
         if self.__count is None:
             self.record_counts()
 
@@ -103,6 +103,7 @@ class SRecordFile:
         return False
 
     def min_address(self):
+        """Get the lowest address in the file"""
         addr = self.__records[0].address
         for record in self.__records:
             addr = min(addr, record.address)
@@ -110,6 +111,7 @@ class SRecordFile:
         return addr
 
     def max_address(self):
+        """Get the highest address in the file"""
         addr = self.__records[0].address
         for record in self.__records:
             addr = max(addr, record.address)
@@ -117,6 +119,7 @@ class SRecordFile:
         return addr
 
     def header_content(self):
+        """Get the content of the header record as a string"""
         if not self.has_header():
             pass
 

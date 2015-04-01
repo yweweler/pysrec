@@ -100,9 +100,13 @@ def info(file):
 @click.option('--ascii', help='Test if file is in a valid ASCII representation.')
 @click.argument('file')
 def check(full, types, count, addr, data, crc, ascii, file):
-    click.echo()
+    # TODO
     click.echo("Not implemented yet!")
+    click.echo()
 
+# TODO. implement check sub-command
+# TODO: write S-Record file as C-Header file
+# TODO: convert S-Record file to binary and back
 
 if __name__ == '__main__':
     cli()
