@@ -4,7 +4,7 @@ import binascii
 __all__ = ('SRecordType', 'SRecord')
 
 from enum import Enum
-from colored import fore, back, style
+from colored import fore, style
 from zwuenf.pysrec import SRecordParsingError
 
 
@@ -34,7 +34,7 @@ class SRecord:
         9: 2
     }
 
-    def __init__(self, str):
+    def __init__(self, rec):
         """SRecord constructor"""
 
         self.type = 0x00
@@ -43,7 +43,7 @@ class SRecord:
         self.data = list()
         self.crc = 0x00
 
-        self.__parse__(str)
+        self.__parse__(rec)
 
     def __parse__(self, rec):
         """Parse SRecord from string"""
@@ -112,7 +112,6 @@ class SRecord:
         len_data = 0 if self.data is None else self.data_len()
         return 3 + len_addr + len_data
 
-
     def calc_crc(self):
         """Calculate S-Record checksum"""
 
@@ -120,6 +119,7 @@ class SRecord:
         return ord(struct.pack('<h', ~sum(self.data))[:1])
 
     def build_str(self, color=False):
+        """Get the S-record in its String representation."""
         return self.__str__(color=color)
 
     def __str__(self, color=False):
@@ -134,9 +134,9 @@ class SRecord:
         if not color:
             return 'S{:X}{:02X}{}{}{:02X}'.format(self.type, self.count, str_addr, str_data, self.crc)
         else:
-            return '{}S{:X}{}{:02X}{}{}{}{}{}{:02X}{}'.format(fore.RED,self.type,
-                                                  fore.YELLOW, self.count,
-                                                  fore.GREEN, str_addr,
-                                                  fore.LIGHT_BLUE, str_data,
-                                                  fore.YELLOW, self.crc,
-                                                  style.RESET)
+            return '{}S{:X}{}{:02X}{}{}{}{}{}{:02X}{}'.format(fore.RED, self.type,
+                                                              fore.YELLOW, self.count,
+                                                              fore.GREEN, str_addr,
+                                                              fore.LIGHT_BLUE, str_data,
+                                                              fore.YELLOW, self.crc,
+                                                              style.RESET)

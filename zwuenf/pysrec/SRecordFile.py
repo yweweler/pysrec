@@ -1,10 +1,9 @@
-from zwuenf.pysrec.SRecord import SRecordType, SRecord
+import os
 
 __all__ = ('MOTType', 'SRecordFile')
 
-import os
 from enum import Enum
-
+from zwuenf.pysrec.SRecord import SRecordType, SRecord
 from zwuenf.pysrec import *
 
 
@@ -20,6 +19,7 @@ class SRecordFile:
 
     def __init__(self, file):
         """SRecordFile constructor"""
+
         self.__records = list()
         self.__count = None
 
@@ -40,10 +40,12 @@ class SRecordFile:
 
     def length(self):
         """Return the S-Record file length in bytes"""
+
         return self.__length
 
     def lines(self):
         """Return the S-Record file length in lines"""
+
         return len(self.__records)
 
     # TODO: test
