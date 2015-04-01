@@ -27,22 +27,23 @@ def cli():
 @click.option('--end', default=0, help='Line to end with printing. (allows python style indexing)')
 @click.option('--errors/--no-errors', default=False, help='Don\'t stop displaying the file on parsing errors.')
 @click.option('--color/--no-color', default=True, help='Display S-Record colored to improve readability')
-# TODO. add support for line-numbers
+@click.option('--lines/--no-lines', default=True, help='Display line-numbers')
 @click.argument('file')
-def cat(start, end, errors, color, file):
+def cat(start, end, errors, color, lines, file):
     if not os.path.isfile(file):
         click.echo('File: "{}", is not a file or does not exist.'.format(file))
         exit(1)
 
     with open(file) as f:
-        lines = f.readlines()
+        records = f.readlines()
 
     if end is 0:
-        end = len(lines)
+        end = len(records)
 
-    for i, line in enumerate(lines[start:end]):
+    for i, line in enumerate(records[start:end]):
         try:
-            click.echo(SRecord(line).build_str(color))
+            num = '' if not lines else '[{:08d}] '.format(i)
+            click.echo('{}{}'.format(num, SRecord(line).build_str(color)))
         except SRECError:
             if errors:
                 click.echo('Line could no be parsed! Try again with --no-errors to ignore errors.')
