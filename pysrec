@@ -1,0 +1,100 @@
+#!/usr/bin/env python3
+"""
+The command line interface for pysrec.
+"""
+
+import os
+
+import click
+
+from zwuenf.pysrec.SRecord import SRecord
+from zwuenf.pysrec.SRecordFile import SRecordFile
+from zwuenf.pysrec import SRECError
+
+
+@click.group()
+def cli():
+    """
+    Command line interface for pysrec. Use --help for details.
+    """
+    pass
+
+
+@cli.command(
+    short_help='Print Motorola S-record file.',
+    help="""Print the lines of a Motorola S-Record file.""")
+@click.option('--start', default=0, help='Line to start with printing. (allows python style indexing)')
+@click.option('--end', default=0, help='Line to end with printing. (allows python style indexing)')
+@click.option('--errors/--no-errors', default=False, help='Don\'t stop displaying the file on parsing errors.')
+# TODO: Add color support to enable better reading!
+@click.argument('file')
+def cat(start, end, errors, file):
+    if not os.path.isfile(file):
+        click.echo('File: "{}", is not a file or does not exist.'.format(file))
+        exit(1)
+
+    with open(file) as f:
+        lines = f.readlines()
+
+    if end is 0:
+        end = len(lines)
+
+    for i, line in enumerate(lines[start:end]):
+        try:
+            click.echo(SRecord(line))
+        except SRECError:
+            if errors:
+                click.echo('Line could no be parsed! Try again with --no-errors to ignore errors.')
+                exit(1)
+            pass
+
+
+@cli.command(
+    short_help='Show information about a Motorola S-Record file.',
+    help="""Show information about a Motorola S-Record file.""")
+@click.argument('file')
+def info(file):
+    if not os.path.isfile(file):
+        print('File: "{}", is not a file or does not exist.'.format(file))
+        exit(1)
+
+    # try:
+    file = SRecordFile(file)
+    # except SRECNotSRECFileError:
+    # click.echo('File: "{}", is not a Motorola S-Record file.'.format(file))
+
+    click.echo('=' * 64)
+    click.echo('MOT Type: {}'.format(file.mot_type()))
+
+    # if file.has_header():
+    # click.echo('Header Content: {}'.format(file.header_content()))
+    # else:
+    # click.echo('No Header-Record was found!')
+    #
+    # click.echo('Record statistics: {}'.format(file.record_counts()))
+    #
+    # click.echo('Min. address: {}'.format(file.min_address()))
+    # click.echo('Max. address: {}'.format(file.max_address()))
+    #
+    # click.echo()
+    # click.echo('='*64)
+
+
+@cli.command(
+    short_help='Check a Motorola S-Record file.',
+    help="""Check a Motorola S-Record file for abnormality and errors.""")
+@click.option('--full', help='Test file with all implemented checks.')
+@click.option('--types', help='Test TYPE field for valid SX types')
+@click.option('--count', help='Test COUNT field for valid byte count.')
+@click.option('--addr', help='Test ADDRESS field for valid representation and length.')
+@click.option('--data', help='Test DATA field for valid representation and length.')
+@click.option('--crc', help='Test CRC fields.')
+@click.option('--ascii', help='Test if file is in a valid ASCII representation.')
+@click.argument('file')
+def check(full, types, count, addr, data, crc, ascii, file):
+    click.echo()
+    click.echo("Not implemented yet!")
+
+
+if __name__ == '__main__':
+    cli()
