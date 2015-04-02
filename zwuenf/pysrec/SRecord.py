@@ -108,15 +108,34 @@ class SRecord:
     def length(self):
         """Get the S-Record length in bytes"""
 
-        len_addr = 0 if self.address is None else self.address_len()*2
+        len_addr = 0 if self.address is None else self.address_len()
         len_data = 0 if self.data is None else self.data_len()
         return 3 + len_addr + len_data
 
     def calc_crc(self):
         """Calculate S-Record checksum"""
 
+        field = [self.count]
+
+        if self.address is not None:
+            field.extend([b for b in bytearray(struct.pack('<I', self.address)[:self.address_len()])])
+
+        if self.data is not None:
+            field.extend(self.data)
+
         # return low order byte of the complement of the sum of bytes
-        return ord(struct.pack('<h', ~sum(self.data))[:1])
+        return ord(struct.pack('<h', ~sum(field))[:1])
+
+    def is_type_valid(self):
+        return self.record_group() == SRecordType.UNKNOWN
+
+    def is_count_valid(self):
+        len_addr = 0 if self.address is None else self.address_len()
+        len_data = 0 if self.data is None else self.data_len()
+        return self.count == (len_addr + len_data + 1)
+
+    def is_crc_valid(self):
+        return self.crc == self.calc_crc()
 
     def build_str(self, color=False):
         """Get the S-record in its String representation."""

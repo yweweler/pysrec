@@ -23,21 +23,21 @@ class SRecordFile:
 
         self.__path = file
         self.__count = None
-        self.__records = list()
+        self.records = list()
 
         self.__parse__(file)
 
     def __parse__(self, file):
         """Parse a S-Record file"""
 
-        self.__records = list()
+        self.records = list()
         with open(file) as f:
             for line in f:
                 # TODO: if first byte os 0xFF or something like that, python will fail here!
                 if not line[0] == 'S':
                     raise NotSRecFileError
 
-                self.__records.append(SRecord(line))
+                self.records.append(SRecord(line))
 
     def size(self):
         """Return the S-Record file size in bytes"""
@@ -47,11 +47,11 @@ class SRecordFile:
     def lines(self):
         """Return the S-Record file length in lines"""
 
-        return len(self.__records)
+        return len(self.records)
 
     def mot_type(self):
         """Determine files MOT type"""
-        for record in self.__records:
+        for record in self.records:
             if record.record_group() == SRecordType.UNKNOWN:
                 return MOTType.UNKNOWN
 
@@ -84,7 +84,7 @@ class SRecordFile:
         """Count Record types"""
 
         self.__count = dict()
-        for record in self.__records:
+        for record in self.records:
             if record.type not in self.__count:
                 self.__count[record.type] = 0
 
@@ -104,16 +104,16 @@ class SRecordFile:
 
     def min_address(self):
         """Get the lowest address in the file"""
-        addr = self.__records[0].address
-        for record in self.__records:
+        addr = self.records[0].address
+        for record in self.records:
             addr = min(addr, record.address)
 
         return addr
 
     def max_address(self):
         """Get the highest address in the file"""
-        addr = self.__records[0].address
-        for record in self.__records:
+        addr = self.records[0].address
+        for record in self.records:
             addr = max(addr, record.address)
 
         return addr
@@ -123,4 +123,4 @@ class SRecordFile:
         if not self.has_header():
             pass
 
-        return binascii.unhexlify(binascii.hexlify(bytes(bytearray(self.__records[0].data)))).decode('ascii')
+        return binascii.unhexlify(binascii.hexlify(bytes(bytearray(self.records[0].data)))).decode('ascii')

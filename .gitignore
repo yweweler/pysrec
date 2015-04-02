@@ -3,4 +3,4 @@ __pycache__/
 *.py[cod]
 
 # Pycharm project folder
-.idea/
+.idea/*

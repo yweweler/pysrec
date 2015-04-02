@@ -8,7 +8,7 @@ import os
 import click
 
 from zwuenf.pysrec.SRecord import SRecord
-from zwuenf.pysrec.SRecordFile import SRecordFile
+from zwuenf.pysrec.SRecordFile import SRecordFile, MOTType
 from zwuenf.pysrec import SRECError, NotSRecFileError
 
 
@@ -30,6 +30,8 @@ def cli():
 @click.option('--lines/--no-lines', default=True, help='Display line-numbers')
 @click.argument('file')
 def cat(start, end, errors, color, lines, file):
+    """Print the contents of a Motorola S-Record file."""
+
     if not os.path.isfile(file):
         click.echo('File: "{}", is not a file or does not exist.'.format(file))
         exit(1)
@@ -56,18 +58,21 @@ def cat(start, end, errors, color, lines, file):
     help="""Show information about a Motorola S-Record file.""")
 @click.argument('file')
 def info(file):
+    """Gather information about a Motorola S-Record file."""
+
     if not os.path.isfile(file):
         print('"{}", is not a file or does not exist.'.format(file))
         exit(1)
 
-    click.echo('=' * 64)
+    click.echo('=' * 80)
     click.echo('Analysing file: {}'.format(file))
-    click.echo('=' * 64)
+    click.echo('=' * 80)
 
     try:
         file = SRecordFile(file)
     except NotSRecFileError:
         click.echo('File: "{}", is not a Motorola S-Record file.'.format(file))
+        exit(1)
 
     click.echo('MOT Type: {}'.format(str(file.mot_type()).split('.')[1]))
 
@@ -84,27 +89,79 @@ def info(file):
     click.echo('Min. address: {}'.format(hex(file.min_address())))
     click.echo('Max. address: {}'.format(hex(file.max_address())))
 
-    click.echo('='*64)
+    click.echo('=' * 80)
     click.echo()
 
 
 @cli.command(
     short_help='Check a Motorola S-Record file.',
     help="""Check a Motorola S-Record file for abnormality and errors.""")
-@click.option('--full', help='Test file with all implemented checks.')
-@click.option('--types', help='Test TYPE field for valid SX types')
-@click.option('--count', help='Test COUNT field for valid byte count.')
-@click.option('--addr', help='Test ADDRESS field for valid representation and length.')
-@click.option('--data', help='Test DATA field for valid representation and length.')
-@click.option('--crc', help='Test CRC fields.')
-@click.option('--ascii', help='Test if file is in a valid ASCII representation.')
+@click.option('--types/--no-types', default=True, help='Test TYPE field for valid SX types')
+@click.option('--count/--no-count', default=True, help='Test COUNT field for valid byte count.')
+@click.option('--crc/--no-crc', default=True, help='Test CRC fields.')
 @click.argument('file')
-def check(full, types, count, addr, data, crc, ascii, file):
-    # TODO
-    click.echo("Not implemented yet!")
+def check(types, count, crc, file):
+    """Check each S-Record if the record types, count fields and crc sums are valid."""
+
+    if not os.path.isfile(file):
+        print('"{}", is not a file or does not exist.'.format(file))
+        exit(1)
+
+    click.echo('=' * 80)
+    click.echo('Checking file: {}'.format(file))
+    click.echo('=' * 80)
+
+    try:
+        file = SRecordFile(file)
+    except NotSRecFileError:
+        click.echo('File: "{}", is not a Motorola S-Record file.'.format(file))
+        exit(1)
+
+    if types:
+        click.echo('Checking Record types...')
+
+        click.echo()
+        mottype = file.mot_type()
+        click.echo('MOT Type: {}'.format(str(mottype).split('.')[1]))
+
+        click.echo()
+        click.echo('Records:')
+        if mottype == MOTType.UNKNOWN:
+            count = file.record_counts()
+            for t in count:
+                if not (0 <= t <= 3 or t == 5 or 7 <= t <= 9):
+                    click.echo('Invalid TYPE S{} found {} times'.format(hex(t)[2:].upper(), count[t]))
+        else:
+            click.echo('All Record types are valid.')
+
+        click.echo()
+        click.echo('Header:')
+        if not file.has_header():
+            click.echo('File has no S0 header record!')
+        else:
+            click.echo('File has a S0 header record.')
+
+    click.echo('=' * 80)
+
+    click.echo('Checking for invalid COUNT fields...')
+    click.echo()
+    if count:
+        for i, rec in enumerate(file.records):
+            if not rec.is_count_valid():
+                click.echo('Invalid COUNT: [{:08d}] {}'.format(i, rec))
+
+    click.echo('=' * 80)
+
+    click.echo('Checking for invalid CRC fields...')
+    click.echo()
+    if crc:
+        for i, rec in enumerate(file.records):
+            if not rec.is_crc_valid():
+                click.echo('Invalid CRC: [{:08d}] {}'.format(i, rec))
+
+    click.echo('=' * 80)
     click.echo()
 
-# TODO. implement check sub-command
 # TODO: write S-Record file as C-Header file
 # TODO: convert S-Record file to binary and back
 
