@@ -100,7 +100,7 @@ $ ./pysrec info example.srec
     Max. address: 0x38
     ================================================================================
 
-Now know its a S-record file of the type S19 and the min. and max. addresses. The info sub-command even printed the content of the S0 header record.
+Now we know its a S-Record file of the type S19 and the min. and max. addresses. The info sub-command even printed the content of the S0 header record.
 
 ### check sub-command
 
