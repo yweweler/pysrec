@@ -22,9 +22,7 @@ setup(
     namespace_packages=['zwuenf'],
     install_requires=[
         'click>=3.3',
-        'matplotlib>=1.4.3',
-        'colored>=1.1.5',
-        'numpy>=1.9.2'
+        'colored>=1.1.5'
     ],
     include_package_data=True,
 
@@ -35,7 +33,7 @@ setup(
     description=('This API can be used to interact with and modify Motorola S-Record files.'),
     long_description=long_description,
     license='MIT License',
-    keywords='zwuenf pysrec srec api',
+    keywords='zwuenf pysrec srec api motorola srecord s-record',
     url='http://zwuenf.de/',
     classifiers=[
         'Development Status :: 3 - Alpha',

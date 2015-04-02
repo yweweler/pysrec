@@ -42,7 +42,12 @@ def cat(start, end, errors, color, lines, file):
     if end is 0:
         end = len(records)
 
-    for i, line in enumerate(records[start:end]):
+    i = start
+    if start < 0:
+        i = len(records) + start
+
+    for line in records[start:end]:
+        i += 1
         try:
             num = '' if not lines else '[{:08d}] '.format(i)
             click.echo('{}{}'.format(num, SRecord(line).build_str(color)))
@@ -50,6 +55,7 @@ def cat(start, end, errors, color, lines, file):
             if errors:
                 click.echo('Line could no be parsed! Try again with --no-errors to ignore errors.')
                 exit(1)
+            click.echo('[Error]: skipping line...')
             pass
 
 
@@ -74,6 +80,7 @@ def info(file):
         click.echo('File: "{}", is not a Motorola S-Record file.'.format(file))
         exit(1)
 
+    click.echo('S-Records: {}'.format(len(file.records)))
     click.echo('MOT Type: {}'.format(str(file.mot_type()).split('.')[1]))
 
     click.echo('Records:')
@@ -164,7 +171,7 @@ def check(types, count, crc, file):
 
 
 @cli.command(
-    short_help='Generate a binary file from a Motorola S-Record hallow wie geht es dir du dummerfile.',
+    short_help='Generate a binary file from a Motorola S-Record file.',
     help="""Generate a binary file from a Motorola S-Record file.""")
 # TODO: Add a option to select the fill byte!
 @click.argument('file')
