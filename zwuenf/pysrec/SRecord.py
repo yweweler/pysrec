@@ -17,7 +17,7 @@ class SRecordType(Enum):
 
 
 class SRecord:
-    """Data srtructure fot holding SRecords"""
+    """Data structure fot holding S-Records."""
 
     MIN_RECORD_LEN = 8
     DEFAULT_ADDR_LEN = 3
@@ -35,7 +35,7 @@ class SRecord:
     }
 
     def __init__(self, rec):
-        """SRecord constructor"""
+        """SRecord constructor."""
 
         self.type = 0x00
         self.count = 0x00
@@ -46,7 +46,7 @@ class SRecord:
         self.__parse__(rec)
 
     def __parse__(self, rec):
-        """Parse SRecord from string"""
+        """Parse SRecord from string."""
 
         rec = rec.strip('\r\n')
 
@@ -79,7 +79,7 @@ class SRecord:
         self.crc = int(str_crc, 16)
 
     def address_len(self):
-        """Get address length in bytes for the S-Record"""
+        """Get address length in bytes for the S-Record."""
 
         if self.record_group() is SRecordType.UNKNOWN:
             return self.DEFAULT_ADDR_LEN
@@ -87,7 +87,7 @@ class SRecord:
             return SRecord.ADDR_LEN[self.type]
 
     def record_group(self):
-        """Determine S-Record group"""
+        """Determine S-Record group."""
 
         if self.type == 0:
             return SRecordType.HEADER
@@ -101,19 +101,19 @@ class SRecord:
             return SRecordType.UNKNOWN
 
     def data_len(self):
-        """Get data length in bytes for the S-Record"""
+        """Get data length in bytes for the S-Record."""
 
         return len(self.data)
 
     def length(self):
-        """Get the S-Record length in bytes"""
+        """Get the S-Record length in bytes."""
 
         len_addr = 0 if self.address is None else self.address_len()
         len_data = 0 if self.data is None else self.data_len()
         return 3 + len_addr + len_data
 
     def calc_crc(self):
-        """Calculate S-Record checksum"""
+        """Calculate S-Record checksum."""
 
         field = [self.count]
 
@@ -127,18 +127,23 @@ class SRecord:
         return ord(struct.pack('<h', ~sum(field))[:1])
 
     def is_type_valid(self):
+        """Check if the S-Record type is valid."""
+
         return self.record_group() == SRecordType.UNKNOWN
 
     def is_count_valid(self):
+        """Check if the byte count of the S-Record is valid."""
+
         len_addr = 0 if self.address is None else self.address_len()
         len_data = 0 if self.data is None else self.data_len()
         return self.count == (len_addr + len_data + 1)
 
     def is_crc_valid(self):
+        """Check if the crc of the S-Record is valid."""
         return self.crc == self.calc_crc()
 
     def build_str(self, color=False):
-        """Get the S-record in its String representation."""
+        """Get the S-Record in its string representation."""
         return self.__str__(color=color)
 
     def __str__(self, color=False):

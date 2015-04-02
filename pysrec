@@ -121,12 +121,12 @@ def check(types, count, crc, file):
         click.echo('Checking Record types...')
 
         click.echo()
-        mottype = file.mot_type()
-        click.echo('MOT Type: {}'.format(str(mottype).split('.')[1]))
+        mot_type = file.mot_type()
+        click.echo('MOT Type: {}'.format(str(mot_type).split('.')[1]))
 
         click.echo()
         click.echo('Records:')
-        if mottype == MOTType.UNKNOWN:
+        if mot_type == MOTType.UNKNOWN:
             count = file.record_counts()
             for t in count:
                 if not (0 <= t <= 3 or t == 5 or 7 <= t <= 9):
@@ -162,8 +162,32 @@ def check(types, count, crc, file):
     click.echo('=' * 80)
     click.echo()
 
-# TODO: write S-Record file as C-Header file
-# TODO: convert S-Record file to binary and back
+
+@cli.command(
+    short_help='Generate a binary file from a Motorola S-Record hallow wie geht es dir du dummerfile.',
+    help="""Generate a binary file from a Motorola S-Record file.""")
+# TODO: Add a option to select the fill byte!
+@click.argument('file')
+@click.argument('target')
+def binary(file, target):
+    """Generate a binary file from a S-Record file"""
+
+    if not os.path.isfile(file):
+        print('"{}", is not a file or does not exist.'.format(file))
+        exit(1)
+
+    click.echo('Converting file {} to binary {} ...'.format(file, target))
+
+    try:
+        file = SRecordFile(file)
+    except NotSRecFileError:
+        click.echo('File: "{}", is not a Motorola S-Record file.'.format(file))
+        exit(1)
+
+    # TODO: implement!
+    file.write_binary(target)
+    click.echo('Converting file done!')
+
 
 if __name__ == '__main__':
     cli()
