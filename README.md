@@ -1,5 +1,7 @@
 # Python SREC Tools
 
+[![Build Status](https://travis-ci.org/yweweler/pysrec.svg?branch=master)](https://travis-ci.org/yweweler/pysrec)
+
 **pysrec** is a Python 3 module for handling Motorola S-Record files.
 It also delivers a command line tool to perform basic interaction with S-Record files.
 
