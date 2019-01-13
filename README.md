@@ -56,7 +56,7 @@ $ ./pysrec cat --help
 ```
 
 Using the following example file from
-[Wikipedia SREC (file format)] (http://en.wikipedia.org/wiki/SREC_%28file_format%29)
+[Wikipedia SREC (file format)](http://en.wikipedia.org/wiki/SREC_%28file_format%29)
 we will take a deeper look at the usage.
 
     S00F000068656C6C6F202020202000003C
