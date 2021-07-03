@@ -39,7 +39,7 @@ def cat(start, end, errors, color, lines, file):
     with open(file) as f:
         records = f.readlines()
 
-    if end is 0:
+    if end == 0:
         end = len(records)
 
     i = start
