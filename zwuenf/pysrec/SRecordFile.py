@@ -133,5 +133,14 @@ class SRecordFile:
     def write_binary(self, path):
         """Generate a binary file from the S-Record file."""
 
-        # TODO: implement
-        pass
+        with open(path, "wb") as _fp:
+            for r in self.records:
+                if r.type not in [1, 2, 3]:
+                    # Not a data type; we don't need it to write binary rom
+                    # print("skipping type %s (%s)" % (r.type, str(r)))
+                    continue
+                if r.type in [2, 3]:
+                    raise Exception("Types 2 and 3 haven't been tested yet")
+                _fp.seek(r.address)
+                for d in r.data:
+                    _fp.write(d)

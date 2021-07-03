@@ -74,7 +74,7 @@ class SRecord:
         # not all records used to have a data field entry
         self.data = None
         if len(str_data) > 0:
-            self.data = [int(str_data[i:i + 2], 16) for i in range(len(str_data))[::2]]
+            self.data = [bytearray.fromhex(str_data[i:i + 2]) for i in range(len(str_data))[::2]]
 
         self.crc = int(str_crc, 16)
 
